@@ -7,7 +7,9 @@ git clone https://github.com/havy-nine/Laundry_decision.git
 해당 깃/src 안에
 
 git clone https://github.com/mcsix/xela_server_ros2.git
+
 git clone https://bitbucket.org/traclabs/trac_ik.git
+
 git clone https://github.com/PickNikRobotics/topic_based_ros2_control.git
 
 
