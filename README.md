@@ -1,13 +1,11 @@
-# piper-laundry
-
 📌 기본 설치
 
-본인 workspace 안에:
+본인 workspace 안에
 
 git clone https://github.com/havy-nine/Laundry_decision.git
 
 
-해당 깃 /src 안에:
+해당 깃/src 안에
 
 git clone https://github.com/mcsix/xela_server_ros2.git
 git clone https://bitbucket.org/traclabs/trac_ik.git
@@ -40,73 +38,61 @@ python enable.py                           # raw 값 mode로
 ros2 run xela_server_ros2 xela_service.py   # /xServTopic 토픽화
 
 🐍 파이썬 파일 실행
-# MoveIt 환경 세팅
-ros2 launch piper_with_gripper_moveit wm_demo.launch.py real:=true
+ros2 launch piper_with_gripper_moveit wm_demo.launch.py real:=true   # MoveIt 환경 세팅
 
-# 실행 경로 이동
-cd mcy_ws/piper-mou/src/piper_ros/src/piper_moveit/piper_with_gripper_moveit/src
+cd mcy_ws/piper-mou/src/piper_ros/src/piper_moveit/piper_with_gripper_moveit/src   # 실행 경로 이동
 
-# (conda 환경에서 실행)
-python node2.py     # conda activate rs 필요
+# conda 환경에서 실행
+python node2.py
 
 📁 파일 설명 (piper_with_gripper_moveit/src)
-• basket.py
+basket.py
+- 충돌 감지까지 되어 있음
+- move_forward 함수:
+    mode=9 → mode=6 변경
+    + 충돌 감지 기능 추가 필요
 
-충돌 감지까지 되어 있습니다.
-move_forward 함수에서 mode=9 → mode=6 변경 + 충돌 감지 추가 필요
+Logic_inte_ba.py
+- ba → wm 이동 로직
+- 실패 복구 기능 포함
 
-• Logic_inte_ba.py
+Logic_inte_wm.py
+- wm → ba 이동 로직
+- k-means / FCM 클러스터링 모두 가능
+- sensor_callback 내부 주석 참고 (cluster)
 
-ba → wm 실행 파일
 
-실패 복구 포함
+둘 다 conda 환경에서 실행해야 함
+필요 시 kroc.py 의 sensor_callback 참고
 
-• Logic_inte_wm.py
+node2.py
+- Vision → PoseGoal 좌표 명령 노드
+- conda(rs) 환경에서 실행
+- 자세한 구조: https://github.com/havy-nine/Laundry_decision
 
-wm → ba 실행 파일
-
-둘 다 k-means / FCM 가능
-sensor_callback 함수에 주석 처리해둠 (cluster)
-conda 실행 필요
-안되면 kroc.py의 sensor_callback 참고
-
-• node2.py
-
-요청 받아서 좌표 보내주는 파일
-
-conda(rs) 환경에서 실행
-
-상세 내용:
-https://github.com/havy-nine/Laundry_decision
-
-• pose_goal.cpp
-
-PoseGoal 액션으로 moveit 명령 전달
+pose_goal.cpp
+- PoseGoal 액션 정의
+- MoveIt trajectory 생성/전달
 
 🔗 링크 구조
 link6 <-0.11-> deep <-0.03-> tcp <-0.02-> EEE
 
 
-해당 경로에서 수정 가능:
+수정 경로:
 
 piper_ros/src/piper_description/urdf/piper_description.xacro
 
 🎛 mode 별 설명
 mode	설명
-0	tcp 기준 pose 명령 → moveit 경로 생성
-1	tcp 기준 position + 현재 orientation + 각도 제한
-6	deep 기준 pose 명령 → 직접 IK 풀어서 경로 생성
-8	tcp 기준 pose 명령 → LIN 경로 생성
-9	deep 기준 pose 명령 → LIN 경로 생성
-
-모드는 0~9까지 가능
-
-2,3,4,5,7 사용하거나 확장하려면 127번 line 수정 필요
+0	tcp 기준 pose → moveit 경로 생성
+1	tcp 기준 position + orientation 기반 각도 제한
+6	deep 기준 pose → 직접 IK 풀어서 경로 생성
+8	tcp 기준 pose → LIN 경로 생성
+9	deep 기준 pose → LIN 경로 생성
+- 모드는 0~9까지 지원
+- 2,3,4,5,7 사용하려면 127번 line 수정 필요
 
 🧪 TEST_stop_demo.py
-
-MoveIt 경로 기준
-
-예측 전류 vs 실제 전류 비교
-
-오차가 넘으면 즉시 정지
+- MoveIt 경로 기반 토크/전류 예측
+- 예측 vs 실제 비교
+- 오차가 4σ 넘으면 즉시 정지
