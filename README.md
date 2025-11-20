@@ -82,28 +82,19 @@ pose_goal.cpp
 - PoseGoal 액션 처리
 - MoveIt 경로 생성 및 전송
 
-
-# 🔗 링크 구조
-
+🔗 링크 구조
 link6 <-0.11-> deep <-0.03-> tcp <-0.02-> EEE
+수정 위치: piper_ros/src/piper_description/urdf/piper_description.xacro
 
-수정 위치:
-piper_ros/src/piper_description/urdf/piper_description.xacro
-
-
-# 🎛 mode 설명
-
+🎛 mode 설명
 0 : tcp pose → MoveIt 경로 생성
-1 : tcp position + ORIENTATION angle limit 적용
-6 : deep pose → IK 직접 풀어 경로 생성
+1 : tcp position + ORIENTATION angle limit
+6 : deep pose → IK 직접 풀어서 경로 생성
 8 : tcp pose → LIN 경로 생성
 9 : deep pose → LIN 경로 생성
+※ 모드는 0~9까지 가능  
+※ 2,3,4,5,7 사용하려면 pose_goal.cpp 127번 라인 수정 필요
 
-* 모드는 0~9까지 사용 가능
-* 2,3,4,5,7 추가 사용하려면 pose_goal.cpp 127번 라인 수정 필요
-
-
-# 🧪 TEST_stop_demo.py
-
-MoveIt 경로 기반 예측 전류 vs 실제 전류 비교  
-오차가 4σ 초과하면 즉시 정지하는 데모 파일
+TEST_stop_demo.py
+- MoveIt 경로 기반 예측 전류 vs 실제 전류 비교
+- 4σ 오차 초과하면 즉시 정지하는 데모 파일
