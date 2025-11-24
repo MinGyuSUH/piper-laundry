@@ -39,7 +39,7 @@ mode 별 설명입니다.
   : position + RPY orientation constraint (tcp 기준)
 
 - `send_pose_wm()` → `mode = 0`  
-**: 실패 복구를 포함한 ba에서 wm으구
+**: 실패 복구를 포함한 ba에서 wm으로로
   : position + RPY orientation 고정 (tcp 기준)
 
 - `move_forward()` → `mode = 9`  
@@ -64,7 +64,7 @@ mode 별 설명입니다.
 
 
 ### 🔹 Logic_inte_wm.py
-**위와 거의 동일**  
+**위와 PoseGoal 빼고 동일**  
 
 #### 1) PoseGoal 모드 매핑
 - `send_pose()` → `mode = 1`  
