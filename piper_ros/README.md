@@ -33,19 +33,17 @@ mode 별 설명입니다.
 - `reset_sensor_data()`  
   : 누적 taxel 벡터(`cum_x/y/z`)와 판단 플래그를 초기화
 
----
 
 #### 1) PoseGoal 모드 매핑
-- `send_pose_wm()` → `mode = 0`  
-  : 기본 pose 기반 MoveIt planning (tcp 기준)
-
 - `send_pose_ba()` → `mode = 1`  
   : position + RPY orientation constraint (tcp 기준)
 
-- `move_forward()` → `mode = 9`  
-  : DEEP 기준 LIN 직선 이동(밀어넣기)
+- `send_pose_wm()` → `mode = 0`  
+  : position + RPY orientation 고정 (tcp 기준)
 
----
+- `move_forward()` → `mode = 9`  
+  : RPY orientation 고정 LIN 직선 이동(DEEP 기준)
+
 
 #### 2) 접촉/정렬 판단 방식 선택 (Heuristic / KMeans / FCM)
 판단 결과는 **아래 flag 중 무엇을 보느냐**로 방식이 결정됩니다.
