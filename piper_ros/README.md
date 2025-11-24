@@ -96,8 +96,7 @@ mode 별 설명입니다.
 ### 🔹 Logic_inte_wm.py
 **위와 함수 이름 빼고 동일**  
 
-#### 2) TargetPose 수신 함수 (node2.py와 통신)
-아래 함수들은 **TargetPose 액션 서버(node2.py)** 에게 target을 요청해서 받아오는 역할입니다.
+#### 2) TargetPose 수신 함수
 
 - `target_get()`  
   : wm 영역 기준 target pose 요청 (`mode="wm"`).  
