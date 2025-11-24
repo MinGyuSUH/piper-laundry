@@ -1,4 +1,4 @@
-# 🚀 Piper-Laundry
+# Piper-Laundry
 
 ## 추가 설치
 
