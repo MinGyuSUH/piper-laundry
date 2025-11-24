@@ -68,10 +68,10 @@ mode 별 설명입니다.
 
 #### 1) PoseGoal 모드 매핑
 - `send_pose()` → `mode = 1`  
-  : position + RPY orientation constraint (tcp 기준)
+  : position + RPY orientation constraint (tcp 기준) <br><br>
   
 
-→ 둘 다 k-means fcm도 가능하고 sensor_callback 함수에 주석 처리 해놨습니다. (cluster) conda 에서 실행해야 합니다. ( conda activate cluster )
+**→ 둘 다 k-means, fcm도 가능하고 sensor_callback 함수에 주석 처리 해놨습니다.** (cluster) conda 에서 실행해야 합니다. ( conda activate cluster )
 
 혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.
 
