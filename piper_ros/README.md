@@ -33,8 +33,38 @@ mode 별 설명입니다.
 - `reset_sensor_data()`  
   : 누적 taxel 벡터(`cum_x/y/z`)와 판단 플래그를 초기화
 
+#### 1) 기본 조인트 이동 함수
+- `goal(q_8dof, gripper_action='keep')`  
+  : **조인트 space 이동 함수**  
+  - 앞 **6축(arm)** → MoveIt FollowJointTrajectory  
+  - **7~8축(gripper)** → 별도 Gripper 액션 서버 제어
 
-#### 1) PoseGoal 모드 매핑
+**gripper_action 옵션**
+
+| 값 | 기능 |
+|-----|--------|
+| `'keep'` | 그리퍼 상태 유지 (기본값) |
+| `'open'` | `open_gripper()` 호출 → 그리퍼 오픈 |
+| `'close'` | `close_gripper()` 호출 → 그리퍼 클로즈 |
+
+
+#### 2) TargetPose 수신 함수 (node2.py와 통신)
+아래 함수들은 **TargetPose 액션 서버(node2.py)** 에게 target을 요청해서 받아오는 역할입니다.
+
+- `target_get_bg()`  
+  : 배경/기준 프레임 저장용 요청 (`mode="failure_bg"`).  
+  grasp 전에 background를 갱신해 segmentation 안정화에 사용됩니다.
+
+- `target_get_ba()`  
+  : basket 영역 기준 target pose 요청 (`mode="basket"`).  
+  → EE pose(`/end_pose`)와 ee2cam 캘리브레이션을 이용해 base 좌표로 변환합니다.
+
+- `target_get_wm()`  
+  : wm 영역 기준 target pose 요청 (`mode="failure"`).  
+  → 동일하게 base 좌표로 변환 후 실패복구에 사용합니다.
+
+
+#### 3) PoseGoal 모드 매핑
 - `send_pose_ba()` → `mode = 1`  
   : position + RPY orientation constraint (tcp 기준)
 
@@ -46,7 +76,7 @@ mode 별 설명입니다.
   : RPY orientation 고정 LIN 직선 이동(DEEP 기준)
 
 
-#### 2) 접촉/정렬 판단 방식 선택 (Heuristic / KMeans / FCM)
+#### 4) 접촉/정렬 판단 방식 선택 (Heuristic / KMeans / FCM)
 판단 결과는 **아래 flag 중 무엇을 보느냐**로 방식이 결정됩니다.
 
 - **Heuristic (기본)**
@@ -64,9 +94,15 @@ mode 별 설명입니다.
 
 
 ### 🔹 Logic_inte_wm.py
-**위와 PoseGoal 빼고 동일**  
+**위와 함수 이름 빼고 동일**  
 
-#### 1) PoseGoal 모드 매핑
+#### 2) TargetPose 수신 함수 (node2.py와 통신)
+아래 함수들은 **TargetPose 액션 서버(node2.py)** 에게 target을 요청해서 받아오는 역할입니다.
+
+- `target_get()`  
+  : wm 영역 기준 target pose 요청 (`mode="wm"`).  
+
+#### 3) PoseGoal 모드 매핑
 - `send_pose()` → `mode = 1`  
   : position + RPY orientation constraint (tcp 기준)
 
