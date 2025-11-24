@@ -23,8 +23,46 @@ mode 별 설명입니다.
 ---
 
 ### 🔹 Logic_inte_ba.py
-**설명:**  
-(여기에 설명을 넣을 예정)
+**: 실패 복구를 포함한 ba에서 wm으로 가는 실행 파일입니다.**  
+
+
+#### 0) 센서 리셋 타이밍 (중요)
+잡기/접촉 판단은 **누적 벡터 기반**이라, 시도 시작 전에 잔상 제거가 필요합니다.  
+각 grasp/approach 시도 전에 아래를 **반드시 호출**하세요.
+
+- `reset_sensor_data()`  
+  : 누적 taxel 벡터(`cum_x/y/z`)와 판단 플래그를 초기화
+
+---
+
+#### 1) PoseGoal 모드 매핑
+- `send_pose_wm()` → `mode = 0`  
+  : 기본 pose 기반 MoveIt planning (tcp 기준)
+
+- `send_pose_ba()` → `mode = 1`  
+  : position + RPY orientation constraint (tcp 기준)
+
+- `move_forward()` → `mode = 9`  
+  : DEEP 기준 LIN 직선 이동(밀어넣기)
+
+---
+
+#### 2) 접촉/정렬 판단 방식 선택 (Heuristic / KMeans / FCM)
+판단 결과는 **아래 flag 중 무엇을 보느냐**로 방식이 결정됩니다.
+
+- **Heuristic (기본)**
+  - 파지(정렬) : `z_aligned`
+  - 슬립/접촉 : `contacted`
+
+- **KMeans**
+  - 파지(정렬) : `z_aligned_k`
+  - 슬립/접촉 : `contacted_kk`  *(strong contact 누적 플래그)*
+
+- **FCM**
+  - 파지(정렬) : `z_aligned_f`
+  - 슬립/접촉 : `contacted_ff`  *(soft contact 누적 플래그)*
+
+
 
 ### 🔹 Logic_inte_wm.py
 **설명:**  
