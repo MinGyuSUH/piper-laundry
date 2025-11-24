@@ -70,7 +70,7 @@ mode 별 설명입니다.
 - `send_pose()` → `mode = 1`  
   : position + RPY orientation constraint (tcp 기준)
 
-  - `move_forward()` → `mode = 9`  
+- `move_forward()` → `mode = 9`  
   : RPY orientation 고정 LIN 직선 이동(DEEP 기준)<br><br>
   
 
