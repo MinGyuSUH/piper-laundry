@@ -1,0 +1,21 @@
+# PoseGoal.action
+# Goal
+int8 mode                     # 0: POSE, 1: RPY_CONST, 2: CARTESIAN
+geometry_msgs/PoseStamped target_pose
+
+# mode==1 & 2 RPY_CONST
+float64 roll_tol_rad          # default 1.0
+float64 pitch_tol_rad         # default 1.0
+float64 yaw_tol_rad           # default 3.14
+
+# mode==2 SERVO
+# float64 ee_step              # default 0.01
+
+
+---
+# Result
+bool success
+string message
+---
+# Feedback
+string state

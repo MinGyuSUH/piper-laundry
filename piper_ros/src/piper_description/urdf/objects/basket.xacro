@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<robot name="basket" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="basket" params="prefix">
+
+    <link name="basket">
+      <!-- 바닥 -->
+      <visual>
+        <geometry>
+          <box size="0.4 0.28 0.025"/>
+        </geometry>
+        <origin xyz="0 0 0.0125" rpy="0 0 0"/>
+        <material name="brown">
+          <color rgba="0.8 0.6 0.5 1"/>
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.4 0.28 0.025"/>
+        </geometry>
+        <origin xyz="0 0 0.0125" rpy="0 0 0"/>
+      </collision>
+
+      <!-- 앞 벽 -->
+      <visual>
+        <geometry>
+          <box size="0.4 0.004 0.17"/>
+        </geometry>
+        <origin xyz="0 0.142 0.085" rpy="0 0 0"/>
+        <material name="brown"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.4 0.004 0.17"/>
+        </geometry>
+        <origin xyz="0 0.142 0.085" rpy="0 0 0"/>
+      </collision>
+
+      <!-- 뒤 벽 -->
+      <visual>
+        <geometry>
+          <box size="0.4 0.004 0.17"/>
+        </geometry>
+        <origin xyz="0 -0.142 0.085" rpy="0 0 0"/>
+        <material name="brown"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.4 0.004 0.17"/>
+        </geometry>
+        <origin xyz="0 -0.142 0.085" rpy="0 0 0"/>
+      </collision>
+
+      <!-- 왼쪽 벽 -->
+      <visual>
+        <geometry>
+          <box size="0.004 0.28 0.17"/>
+        </geometry>
+        <origin xyz="0.202 0 0.085" rpy="0 0 0"/>
+        <material name="brown"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.004 0.28 0.17"/>
+        </geometry>
+        <origin xyz="0.202 0 0.085" rpy="0 0 0"/>
+      </collision>
+
+      <!-- 오른쪽 벽 -->
+      <visual>
+        <geometry>
+          <box size="0.004 0.28 0.17"/>
+        </geometry>
+        <origin xyz="-0.202 0 0.085" rpy="0 0 0"/>
+        <material name="brown"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.004 0.28 0.17"/>
+        </geometry>
+        <origin xyz="-0.202 0 0.085" rpy="0 0 0"/>
+      </collision>
+    </link>
+  </xacro:macro>
+</robot>

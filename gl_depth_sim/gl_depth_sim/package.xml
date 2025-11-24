@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gl_depth_sim</name>
+  <version>0.0.1</version>
+  <description>The gl_depth_sim package</description>
+
+  <maintainer email="Jmeyer1292@gmail.com">Jonathan Meyer</maintainer>
+
+  <license>LGPLv3</license>
+
+  <depend>assimp</depend>
+  <depend>libopencv-dev</depend>
+  <depend>libpcl-all-dev</depend>
+  <depend>eigen</depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,27 @@
+# pilz_industrial_motion_planner_planning.yaml
+
+# 어떤 파이프라인을 로드할지 (전역)
+planning_pipelines: [pilz_industrial_motion_planner, ompl, chomp]
+default_planning_pipeline: ompl   # 기본은 OMPL 유지하고 RViz에서 Pilz 선택해도 됨
+
+# 전역 요청 어댑터 (request_adapters) - 최상위 키!
+request_adapters: >-
+  default_planner_request_adapters/ResolveConstraintFrames
+  default_planner_request_adapters/ValidateWorkspaceBounds
+  default_planner_request_adapters/CheckStartStateBounds
+  default_planner_request_adapters/CheckStartStateCollision
+  default_planner_request_adapters/FixWorkspaceBounds
+  default_planner_request_adapters/FixStartStateBounds
+  default_planner_request_adapters/FixStartStateCollision
+  default_planner_request_adapters/FixStartStatePathConstraints
+  # 필요하면: default_planner_request_adapters/AddRuckigTrajectorySmoothing
+
+# 전역 응답 어댑터 (response_adapters) - 최상위 키!
+response_adapters: >-
+  default_planning_response_adapters/AddTimeOptimalParameterization
+  default_planning_response_adapters/ValidateSolution
+  default_planning_response_adapters/DisplayMotionPath
+
+# Pilz 파이프라인 등록(플러그인 명만)
+pilz_industrial_motion_planner:
+  planning_plugin: pilz_industrial_motion_planner/CommandPlanner

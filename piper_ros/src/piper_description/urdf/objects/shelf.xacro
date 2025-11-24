@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<robot name="shelf" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <link name="shelf">
+    <!-- 상판 -->
+    <visual>
+      <geometry>
+        <box size="0.56 0.20 0.03"/>
+      </geometry>
+      <origin xyz="0 0 0.33" rpy="0 0 0"/>
+      <material name="wood_top">
+        <color rgba="0.6 0.4 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.56 0.20 0.03"/>
+      </geometry>
+      <origin xyz="0 0 0.33" rpy="0 0 0"/>
+    </collision>
+
+    <!-- 왼쪽 다리 -->
+    <visual>
+      <geometry>
+        <box size="0.03 0.20 0.33"/>
+      </geometry>
+      <origin xyz="-0.26 0 0.165" rpy="0 0 0"/>
+      <material name="wood_leg">
+        <color rgba="0.4 0.3 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.03 0.20 0.33"/>
+      </geometry>
+      <origin xyz="-0.26 0 0.165" rpy="0 0 0"/>
+    </collision>
+
+    <!-- 오른쪽 다리 -->
+    <visual>
+      <geometry>
+        <box size="0.03 0.20 0.33"/>
+      </geometry>
+      <origin xyz="0.26 0 0.165" rpy="0 0 0"/>
+      <material name="wood_leg"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.03 0.20 0.33"/>
+      </geometry>
+      <origin xyz="0.26 0 0.165" rpy="0 0 0"/>
+    </collision>
+  </link>
+
+</robot>

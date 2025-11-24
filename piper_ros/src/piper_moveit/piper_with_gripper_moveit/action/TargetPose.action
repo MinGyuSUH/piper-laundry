@@ -1,0 +1,12 @@
+# Goal
+bool start
+string mode
+
+---
+# Result
+bool success
+geometry_msgs/Pose target_pose  # 좌표값, 성공일 경우에만 유효
+int32 col
+float64 col2
+---
+# Feedback

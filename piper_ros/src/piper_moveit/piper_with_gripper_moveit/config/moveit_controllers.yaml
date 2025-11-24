@@ -1,0 +1,67 @@
+# MoveIt uses this configuration for controller management
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+moveit_simple_controller_manager:
+  update_rate: 500
+  controller_names:
+    - arm_controller
+    - gripper_controller
+    # - arm_velocity_controller  # CLIK
+    # - arbiter_controller
+
+  # arbiter_controller:
+  #   type: FollowJointTrajectory
+  #   action_ns: follow_joint_trajectory
+  #   default: true
+  #   joints:
+  #     - joint1
+  #     - joint2
+  #     - joint3
+  #     - joint4
+  #     - joint5
+  #     - joint6
+  #   default: true
+
+
+  arm_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+    action_ns: follow_joint_trajectory
+    default: true
+
+  gripper_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    default: true
+    joints:
+      - joint7
+      - joint8
+    action_ns: follow_joint_trajectory
+    default: true
+
+  # # CLIK  
+  # arm_velocity_controller:
+  #   type: FollowJointTrajectory # 타입은 중요하지 않지만 형식상 필요합니다.
+  #   action_ns: follow_joint_trajectory
+  #   default: false # MoveIt!의 기본 컨트롤러가 아님을 명시
+  #   joints:
+  #     - joint1
+  #     - joint2
+  #     - joint3
+  #     - joint4
+  #     - joint5
+  #     - joint6
+
+  trajectory_execution:
+    allowed_execution_duration_scaling: 20.0
+    allowed_goal_duration_margin : 10.0
+    execution_duration_monitoring: true
