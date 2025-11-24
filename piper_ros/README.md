@@ -1,6 +1,6 @@
 
 ### 🔹 pose_goal.cpp
-**설명 : PoseGoal 액션으로 주고 받으며 moveit 명령을 전달합니다.**  
+**: PoseGoal 액션으로 주고 받으며 moveit 명령을 전달합니다.**  
 
 
 현재 링크 구조  
@@ -22,22 +22,17 @@ mode 별 설명입니다.
 
 ---
 
-
-### 🔹 basket.py
-**설명:**  
-
-
----
-
 ### 🔹 Logic_inte_ba.py
 **설명:**  
 (여기에 설명을 넣을 예정)
 
----
-
 ### 🔹 Logic_inte_wm.py
 **설명:**  
 (여기에 설명을 넣을 예정)
+
+→ 둘 다 k-means fcm도 가능하고 sensor_callback 함수에 주석 처리 해놨습니다. (cluster) conda 에서 실행해야 합니다. ( conda activate cluster )
+
+혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.
 
 ---
 
