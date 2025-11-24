@@ -88,7 +88,14 @@ mode 별 설명입니다.
 
 
 ### 🔹 TEST_stop_demo.py
-**설명:**  
-(여기에 설명을 넣을 예정)
+**: moveit에서 생성한 경로로 예측한 전류랑 실제 전류랑 비교해서 넘어가면 멈추는 데모 파일 입니다.**  
+
+
+- `/end_pose`를 받아 target pose 갱신
+- pose_goal(mode 8 → mode 6) 반복 이동
+- 100Hz 예측 토크 계산 + 실 Effort 비교
+- 4σ 이상 오차 발생 시 즉시 정지(cancel + override)
+- `q` = 강제 정지 / `s` = 재시작
+- 실시간 토크 플롯 시각화 포함
 
 ---
