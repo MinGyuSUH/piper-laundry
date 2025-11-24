@@ -23,6 +23,22 @@ mode 별 설명입니다.
 ---
 
 ### 🔹 Logic_inte_ba.py
+**: 실패 복구를 포함한 ba에서 wm으로 가는 실행 파일입니다.**  
+
+
+#### 0) 센서 리셋 타이밍 (중요)
+잡기/접촉 판단은 **누적 벡터 기반**이라, 시도 시작 전에 잔상 제거가 필요합니다.  
+각 grasp/approach 시도 전에 아래를 **반드시 호출**하세요.
+
+- `reset_sensor_data()`  
+  : 누적 taxel 벡터(`cum_x/y/z`)와 판단 플래그를 초기화
+
+
+#### 1) PoseGoal 모드 매핑
+- `send_pose_ba()` → `mode = 1`  
+  : position + RPY orientation constraint (tcp 기준)
+
+- `send_pose_wm()` → `mode = 0`  
 **: 실패 복구를 포함한 ba에서 wm으구
   : position + RPY orientation 고정 (tcp 기준)
 
