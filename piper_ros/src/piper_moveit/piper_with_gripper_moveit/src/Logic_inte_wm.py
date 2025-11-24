@@ -17,6 +17,51 @@ from scipy.spatial.transform import Rotation as R
 from rclpy.clock import Clock
 from collections import deque
 
+########################## 비지도 클러스터링 ####################################################
+
+# import joblib
+
+# EPS = 1e-6
+
+# # fcm.joblib 언피클용 최소 클래스(이 이름이 없으면 로드 에러)
+# class FCMModel:
+#     def __init__(self, prep=None, centers=None, m: float = 2.0) -> None:
+#         self.prep = prep
+#         self.centers_ = centers
+#         self.m = float(m)
+
+# def _np64(x):
+#     return np.require(np.asarray(x, dtype=np.float64), dtype=np.float64, requirements=["C"])
+
+# def _extract_imputer_scaler(prep):
+#     """ColumnTransformer('num' 파이프라인)에서 imputer/scaler 파라미터 추출"""
+#     num = prep.named_transformers_["num"]
+#     imputer = num.named_steps["impute"]
+#     scaler  = num.named_steps["scale"]
+#     imp = _np64(imputer.statistics_)     # (3,)
+#     mean = _np64(scaler.mean_)           # (3,)
+#     scale = _np64(scaler.scale_)         # (3,)
+#     scale[scale == 0.0] = 1.0
+#     return imp, mean, scale
+
+# def _preprocess_mb(mb_vec3, imp_stats, mean, scale):
+#     """mb(3,) → impute+standardize → (1,3) float64"""
+#     X = _np64(mb_vec3).reshape(1, 3)
+#     if np.isnan(X).any():
+#         X = np.where(np.isnan(X), imp_stats.reshape(1, 3), X)
+#     Xs = (X - mean.reshape(1, 3)) / scale.reshape(1, 3)
+#     return _np64(Xs)
+
+# def _fcm_membership(Xs, centers, m):
+#     """Xs: (n,3), centers: (C,3) → U: (C,n)"""
+#     Xs = _np64(Xs); centers = _np64(centers)
+#     d = np.linalg.norm(Xs[:, None, :] - centers[None, :, :], axis=2)
+#     d = np.maximum(d, EPS)
+#     power = 2.0 / (m - 1.0)
+#     U = 1.0 / ((d[:, :, None] / d[:, None, :]) ** power).sum(axis=2)
+#     return U.T
+
+##############################################################################################
 
 
 class ControlTower(Node):
@@ -34,6 +79,69 @@ class ControlTower(Node):
 
         self.z_aligned = False
         self.contacted = False
+
+        self.z_aligned_k = False
+        self.contacted_k = False
+        self.contacted_kk = False
+        self.z_aligned_f = False
+        self.contacted_f = False
+        self.contacted_ff = False
+
+        self.norm = None
+        self.theta = None
+
+########################## 비지도 클러스터링 ####################################################
+
+        # # === KMeans/FCM 모델 로드 및 전처리 파라미터 준비 ===
+        # self.kmeans_available = False
+        # self.fcm_available = False
+
+        # self.kmeans = None
+        # self.fcm_centers = None
+        # self.fcm_m = 2.0
+
+        # self.imp_stats = None
+        # self.scaler_mean = None
+        # self.scaler_scale = None
+
+        # self.minmax_path = "/home/dyros/mcy_ws/piper-mou/src/piper_ros/src/piper_moveit/piper_with_gripper_moveit/src/taxel_minmax_norm.npy"
+        # self.gmin, self.grng = self._load_minmax(self.minmax_path)
+        # self.get_logger().info(f"MinMax loaded: {self.minmax_path}")
+
+        # # 1) kmeans.joblib (sklearn Pipeline: prep + kmeans)
+        # try:
+        #     km_art = joblib.load("/home/dyros/mcy_ws/piper-mou/src/piper_ros/src/piper_moveit/piper_with_gripper_moveit/src/kmeans_norm.joblib")
+        #     if hasattr(km_art, "named_steps") and "prep" in km_art.named_steps and "kmeans" in km_art.named_steps:
+        #         prep = km_art.named_steps["prep"]
+        #         self.kmeans = km_art.named_steps["kmeans"]
+        #         self.imp_stats, self.scaler_mean, self.scaler_scale = _extract_imputer_scaler(prep)
+        #         self.kmeans_available = True
+        #         self.get_logger().info("Loaded kmeans.joblib")
+        # except Exception as e:
+        #     self.get_logger().warn(f"kmeans.joblib load failed: {e}")
+
+        # # 2) fcm.joblib (dict 또는 FCMModel)
+        # try:
+        #     fc_art = joblib.load("/home/dyros/mcy_ws/piper-mou/src/piper_ros/src/piper_moveit/piper_with_gripper_moveit/src/fcm_norm.joblib")
+        #     if isinstance(fc_art, dict) and fc_art.get("type", "") == "fcm":
+        #         prep = fc_art["prep"]
+        #         self.imp_stats, self.scaler_mean, self.scaler_scale = _extract_imputer_scaler(prep)
+        #         self.fcm_centers = _np64(fc_art["centers"])  # (C,3) 표준화 공간
+        #         self.fcm_m = float(fc_art.get("m", 2.0))
+        #         self.fcm_available = True
+        #         self.get_logger().info("Loaded fcm.joblib (dict)")
+        #     elif isinstance(fc_art, FCMModel):
+        #         prep = fc_art.prep
+        #         self.imp_stats, self.scaler_mean, self.scaler_scale = _extract_imputer_scaler(prep)
+        #         self.fcm_centers = _np64(fc_art.centers_)
+        #         self.fcm_m = float(fc_art.m)
+        #         self.fcm_available = True
+        #         self.get_logger().info("Loaded fcm.joblib (FCMModel)")
+        # except Exception as e:
+        #     self.get_logger().warn(f"fcm.joblib load failed: {e}")
+
+#######################################################################################################################################################
+
 
         self.subscription = self.create_subscription(
             SensStream,
@@ -255,6 +363,11 @@ class ControlTower(Node):
         self.prev_x, self.prev_y, self.prev_z = None, None, None
         self.cum_x, self.cum_y, self.cum_z = [0.0] * 16, [0.0] * 16, [0.0] * 16
         self.z_aligned, self.contacted = False, False
+
+        self.z_aligned_k, self.contacted_k = False, False
+        self.contacted_ff, self.contacted_kk = False, False
+        self.z_aligned_f, self.contacted_f = False, False
+
         self.get_logger().info("센서 기준값 및 상태 초기화 완료.")
 
     def sensor_callback(self, msg):
@@ -263,47 +376,103 @@ class ControlTower(Node):
             y_vals = [t.y for t in msg.sensors[0].taxels]
             z_vals = [t.z for t in msg.sensors[0].taxels]
 
-            if self.prev_x is not None:
-                dx = [c - p for c, p in zip(x_vals, self.prev_x)]
-                dy = [c - p for c, p in zip(y_vals, self.prev_y)]
-                dz = [c - p for c, p in zip(z_vals, self.prev_z)]
+            x_vals, y_vals, z_vals = self._normalize_taxels(x_vals, y_vals, z_vals)  # 모두 float64
 
-                for i in range(16):
-                    self.cum_x[i] += dx[i]
-                    self.cum_y[i] += dy[i]
-                    self.cum_z[i] += dz[i]
+            if self.prev_x is None:
+                self.prev_x, self.prev_y, self.prev_z = x_vals, y_vals, z_vals
+                # 첫 프레임엔 예측/표시 안 함
+                self.z_aligned = self.contacted = False
+                self.z_aligned_k = self.contacted_k = False
+                self.z_aligned_f = self.contacted_f = False
+                self.contacted_ff = self.contacted_kk = False
+                # print("처음입니다.")
+                return
 
-                vecs = np.array([self.cum_x, self.cum_y, self.cum_z]).T
-                norms = np.linalg.norm(vecs, axis=1)
-                max_norm = np.max(norms)
-                if max_norm == 0:
-                    max_norm = 1e-6
-                scaled_vecs = vecs / max_norm
-                weights = norms
-                weights[weights == 0] = 1e-6
+            dx = [c - p for c, p in zip(x_vals, self.prev_x)]
+            dy = [c - p for c, p in zip(y_vals, self.prev_y)]
+            dz = [c - p for c, p in zip(z_vals, self.prev_z)]
 
-                mean_vec_biased = np.sum(vecs, axis=0) / np.sum(weights)
-                current_features = np.concatenate([scaled_vecs.flatten(), mean_vec_biased])
+            for i in range(16):
+                self.cum_x[i] += dx[i]
+                self.cum_y[i] += dy[i]
+                self.cum_z[i] += dz[i]
 
-                norm = np.linalg.norm(mean_vec_biased)
-                z_axis = np.array([0, 0, 1])
-                cos_theta = np.dot(mean_vec_biased, z_axis) / (norm + 1e-8)
-                theta_deg = np.degrees(np.arccos(np.clip(cos_theta, -1.0, 1.0)))
+            vecs = np.array([self.cum_x, self.cum_y, self.cum_z]).T
+            norms = np.linalg.norm(vecs, axis=1)
+            max_norm = np.max(norms)
+            if max_norm == 0:
+                max_norm = 1e-6
+            scaled_vecs = vecs / max_norm
+            weights = norms
+            weights[weights == 0] = 1e-6
 
-                if norm < 0.55:
+            mean_vec_biased = np.sum(vecs, axis=0) / np.sum(weights)
+            current_features = np.concatenate([scaled_vecs.flatten(), mean_vec_biased])
+
+            norm = np.linalg.norm(mean_vec_biased)
+            z_axis = np.array([0, 0, 1])
+            cos_theta = np.dot(mean_vec_biased, z_axis) / (norm + 1e-8)
+            theta_deg = np.degrees(np.arccos(np.clip(cos_theta, -1.0, 1.0)))
+
+            self.norm = norm
+            self.theta = theta_deg
+
+            if norm < 0.55:
+                self.z_aligned = False
+            else:
+                if theta_deg < 70.0:
+                    self.z_aligned = True
+                    
+                elif theta_deg <= 110.0:
+                    self.contacted = True
                     self.z_aligned = False
                 else:
-                    if theta_deg < 45:
-                        self.z_aligned = True
-                        
-                    elif theta_deg <= 135:
-                        self.contacted = True
-                        self.z_aligned = False
-                    else:
-                        self.z_aligned = False
+                    self.z_aligned = False
 
+########################## 비지도 클러스터링 ####################################################
 
+            # # --- KMeans/FCM --- COLOR_MAP = {0: "green", 1: "red", 2: "gray"}
+            # LABEL_STATE_MAP_k = {0: (False, True), 1: (True, False), 2: (False, False)}    
+            # LABEL_STATE_MAP_f = {0: (False, True), 1: (False, False), 2: (True, False)}          
+
+            # # --- KMeans ---
+            # if getattr(self, "kmeans_available", False) and self.kmeans is not None and self.imp_stats is not None:
+            #     try:
+            #         Xs_k = _preprocess_mb(mean_vec_biased, self.imp_stats, self.scaler_mean, self.scaler_scale)
+            #         k_label = int(self.kmeans.predict(Xs_k)[0])
+            #         za_k, ct_k = LABEL_STATE_MAP_k.get(k_label, (False, False))
+            #         self.z_aligned_k = bool(za_k)
+            #         self.contacted_k = bool(ct_k)
+            #         if self.contacted_k == True:
+            #             # print("kkkkkkkkkkkkkkkkkk")
+            #             self.contacted_kk = True
+
+            #     except Exception as e:
+            #         self.get_logger().warn(f"KMeans predict skipped: {e}")
+            #         # 이전 값 유지
+
+            # # --- FCM ---
+            # if getattr(self, "fcm_available", False) and self.fcm_centers is not None and self.imp_stats is not None:
+            #     try:
+            #         Xs_f = _preprocess_mb(mean_vec_biased, self.imp_stats, self.scaler_mean, self.scaler_scale)
+            #         U = _fcm_membership(Xs_f, self.fcm_centers, self.fcm_m)  # (C,1)
+            #         f_label = int(np.argmax(U[:, 0]))
+            #         za_f, ct_f = LABEL_STATE_MAP_f.get(f_label, (False, False))
+            #         self.z_aligned_f = bool(za_f)
+            #         self.contacted_f = bool(ct_f)
+            #         if self.contacted_f == True:
+            #             # print("ffffffffffffffff")
+            #             self.contacted_ff = True
+
+            #     except Exception as e:
+            #         self.get_logger().warn(f"FCM predict skipped: {e}")
+            #         # 이전 값 유지
+
+   #############################################################################################################################             
+
+            # prev 갱신 (항상 마지막에)
             self.prev_x, self.prev_y, self.prev_z = x_vals, y_vals, z_vals
+            
         except Exception as e:
             self.get_logger().error(f"Sensor callback error: {e}")
 
