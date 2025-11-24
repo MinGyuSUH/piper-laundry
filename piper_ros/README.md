@@ -85,11 +85,11 @@ mode 별 설명입니다.
 
 - **KMeans**
   - 파지(정렬) : `z_aligned_k`
-  - 슬립/접촉 : `contacted_kk`  *(strong contact 누적 플래그)*
+  - 슬립/접촉 : `contacted_kk` 
 
 - **FCM**
   - 파지(정렬) : `z_aligned_f`
-  - 슬립/접촉 : `contacted_ff`  *(soft contact 누적 플래그)*
+  - 슬립/접촉 : `contacted_ff` 
 
 
 
