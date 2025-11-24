@@ -64,6 +64,8 @@ python node2.py # conda 환경에서 실행 ( conda activate rs )
 
 ## 📂 파일 설명 (piper_with_gripper_moveit/src)
 
+더 자세한 설명은 https://github.com/MinGyuSUH/piper-laundry/blob/main/piper_ros/README.md 를 참고하시면 됩니다.
+
 **basket.py** : ~~충돌 감지까지 되어 있습니다.~~
 move_forward 함수에서 mode=9를 mode=6으로 바꾸고 충돌 감지를 추가해야 합니다.
 
