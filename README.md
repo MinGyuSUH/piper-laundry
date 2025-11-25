@@ -6,7 +6,7 @@ git clone https://github.com/havy-nine/Laundry_decision.git
 
 git clone https://github.com/mcsix/xela_server_ros2.git
 
-git clone https://github.com/aprotyas/trac_ik.git
+git clone https://bitbucket.org/traclabs/trac_ik.git # 일부 파일을 hpp -? h 로 수정해야함
 
 git clone https://github.com/PickNikRobotics/topic_based_ros2_control.git
 
