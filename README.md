@@ -32,9 +32,9 @@ ros2 service call /enable_srv piper_msgs/srv/Enable "enable_request: true" #모�
 
 ### 촉각센서 연결하기
 
-sudo dmesg | grep ttyUSB
+sudo dmesg | grep ttyUSB #명령 결과로 나오는 숫자를 아래에 입력 ex)ttyUSB20
 
-sudo slcand -o -s8 -t hw -S 3000000 /dev/ttyUSB0
+sudo slcand -o -s8 -t hw -S 3000000 /dev/ttyUSB0 
 
 sudo ifconfig can1 up
 
