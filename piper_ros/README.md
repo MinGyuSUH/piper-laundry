@@ -4,7 +4,7 @@
 
 
 현재 링크 구조  
-link6 <-0.11-> deep <-0.03-> tcp <-0.02-> EEE 
+link6 <-0.09-> deep <-0.05-> tcp <-0.02-> EEE 
 
 링크 구조는 piper_ros/src/piper_description/urdf/piper_description.xacro 에서 수정할 수 있습니다.
 
@@ -19,7 +19,7 @@ mode 별 설명입니다.
 | 8 | tcp기준으로 pose 명령 받아서 LIN 으로 경로 생성 |
 | 9 | deep기준으로 pose 명령 받아서 LIN 으로 경로 생성 |
 
-모드는 9번까지 가능하도록 되어있습니다. 2,3,4,5,7을 쓰고 더 쓰려면 127번 line을 수정해야 합니다.<br><br>
+모드는 9번까지 가능하도록 되어있습니다. 2,3,4,5를 쓰고 더 쓰려면 127번 line을 수정해야 합니다.<br><br>
 
 ---
 
