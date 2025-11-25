@@ -4,7 +4,7 @@
 
 
 현재 링크 구조  
-link6 <-0.09-> deep <-0.05-> tcp <-0.02-> EEE 
+link6 <-0.11-> deep <-0.03-> tcp <-0.02-> EEE 
 
 링크 구조는 piper_ros/src/piper_description/urdf/piper_description.xacro 에서 수정할 수 있습니다.
 
