@@ -95,7 +95,7 @@ mode 별 설명입니다.
 
 
 ### 🔹 Logic_inte_wm.py
-**위와 함수 이름 빼고 동일**  
+**위의 Logic_inte_ba.py와 함수 이름 빼고 동일**  
 
 #### 2) TargetPose 수신 함수
 
