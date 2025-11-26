@@ -6,9 +6,11 @@ git clone https://github.com/havy-nine/Laundry_decision.git
 git clone https://github.com/mcsix/xela_server_ros2.git
 git clone https://bitbucket.org/traclabs/trac_ik.git # 일부 파일을 hpp -> h 로 수정해야함
 git clone https://github.com/PickNikRobotics/topic_based_ros2_control.git
-https://xela.lat-d5.com/ 에서 software 최신 버전 설치 (xela_sensor)
-# 촉각 센서 설치는 https://github.com/MinGyuSUH/tactile_xela 를 참고하시면 됩니다.
 ```
+https://xela.lat-d5.com/ 에서 software 최신 버전 설치 (xela_sensor)
+
+촉각 센서 설치는 https://github.com/MinGyuSUH/tactile_xela 를 참고하시면 됩니다.
+
 ---
 
 ## 기본 세팅
