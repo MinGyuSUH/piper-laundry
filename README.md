@@ -54,10 +54,7 @@ python node2.py # conda 환경에서 실행 ( conda activate rs )
 
 자세한 설명은 https://github.com/MinGyuSUH/piper-laundry/blob/main/piper_ros/README.md 를 참고하시면 됩니다.<br><br>
 
-**basket.py** : ~~충돌 감지까지 되어 있습니다.~~
-move_forward 함수에서 mode=9를 mode=6으로 바꾸고 충돌 감지를 추가해야 합니다.
-
-Logic_inte_ba.py와 TEST_stop_demo.py를 참고하시면 됩니다.<br><br>
+**basket.py** : Logic_inte_ba.py에 충돌 감지까지 되어 있습니다.<br><br>
 
 **Logic_inte_ba.py** : 실패 복구를 포함한 ba에서 wm으로 가는 실행 파일입니다.
 
