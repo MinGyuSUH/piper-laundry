@@ -16,9 +16,7 @@ https://xela.lat-d5.com/ 에서 software 최신 버전 설치 (xela_sensor)
 ### 파이퍼 연결하기
 ```bash
 sudo ip link set can0 type can bitrate 1000000
-
 sudo ip link set up can0
-
 ros2 run piper piper_single_ctrl --ros-args -p can_port:=can0 -p gripper_exist:=true -p gripper_val_mutiple:=2
 
 ros2 service call /enable_srv piper_msgs/srv/Enable "enable_request: true" # 모터 활성화
@@ -28,21 +26,15 @@ ros2 service call /enable_srv piper_msgs/srv/Enable "enable_request: true" # 모
 ### 촉각센서 연결하기
 ```bash
 sudo dmesg | grep ttyUSB #명령 결과로 나오는 숫자를 아래에 입력 ex)ttyUSB20
-
 sudo slcand -o -s8 -t hw -S 3000000 /dev/ttyUSB0 
-
 sudo ifconfig can1 up
 
 cd mcy_ws/piper-mou/src/xela_sensor # 실행 경로 이동
-
 ./xela_conf -d socketcan -c can1 # conf 설정
-
 ./xela_server # 서버 실행
 
 python enable.py # raw 값 mode로
-
 ./xela_viz # 시각화
-
 ros2 run xela_server_ros2 xela_service.py # /xServTopic 토픽화
 ```
 ---
@@ -52,7 +44,6 @@ ros2 run xela_server_ros2 xela_service.py # /xServTopic 토픽화
 ros2 launch piper_with_gripper_moveit wm_demo.launch.py real:=true # moveit 환경 세팅
 
 cd mcy_ws/piper-mou/src/piper_ros/src/piper_moveit/piper_with_gripper_moveit/src # 실행 경로 이동
-
 python node2.py # conda 환경에서 실행 ( conda activate rs )
 ```
 ---
