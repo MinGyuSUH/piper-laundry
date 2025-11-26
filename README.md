@@ -54,7 +54,7 @@ python node2.py # conda 환경에서 실행 ( conda activate rs )
 
 자세한 설명은 https://github.com/MinGyuSUH/piper-laundry/blob/main/piper_ros/README.md 를 참고하시면 됩니다.<br><br>
 
-**basket.py** : Logic_inte_ba.py에 충돌 감지까지 되어 있습니다.<br><br>
+**basket.py** : Logic_inte_ba.py에 충돌 감지까지 되어 있으나 move_forward에서 IK err(code=-31)이 나옵니다.<br><br>
 
 **Logic_inte_ba.py** : 실패 복구를 포함한 ba에서 wm으로 가는 실행 파일입니다.
 
