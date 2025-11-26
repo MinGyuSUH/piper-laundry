@@ -83,6 +83,8 @@ Logic_inte_ba.py와 TEST_stop_demo.py를 참고하시면 됩니다.<br><br>
 
 더 자세한 건 (https://github.com/havy-nine/Laundry_decision) 에서 확인할 수 있습니다.<br><br>
 
+**planning_scene.cpp** : 여기서 바구니 위치 등 moveit 환경을 수정할 수 있습니다. <br><br>
+
 **pose_goal.cpp** : PoseGoal 액션으로 주고 받으며 moveit 명령을 전달합니다.<br><br>
 
 **TEST_stop_demo.py** : moveit에서 생성한 경로로 예측한 전류랑 실제 전류랑 비교해서 넘어가면 멈추는 데모 파일 입니다.
