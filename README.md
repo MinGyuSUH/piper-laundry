@@ -3,16 +3,11 @@
 ## 추가 설치
 ```bash
 git clone https://github.com/havy-nine/Laundry_decision.git
-
 git clone https://github.com/mcsix/xela_server_ros2.git
-
 git clone https://bitbucket.org/traclabs/trac_ik.git # 일부 파일을 hpp -> h 로 수정해야함
-
 git clone https://github.com/PickNikRobotics/topic_based_ros2_control.git
-
 https://xela.lat-d5.com/ 에서 software 최신 버전 설치 (xela_sensor)
-
-촉각 센서 설치는 https://github.com/MinGyuSUH/tactile_xela 를 참고하시면 됩니다.
+# 촉각 센서 설치는 https://github.com/MinGyuSUH/tactile_xela 를 참고하시면 됩니다.
 ```
 ---
 
@@ -26,7 +21,7 @@ sudo ip link set up can0
 
 ros2 run piper piper_single_ctrl --ros-args -p can_port:=can0 -p gripper_exist:=true -p gripper_val_mutiple:=2
 
-ros2 service call /enable_srv piper_msgs/srv/Enable "enable_request: true" #모터 활성화
+ros2 service call /enable_srv piper_msgs/srv/Enable "enable_request: true" # 모터 활성화
 ```
 ---
 
