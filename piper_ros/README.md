@@ -14,10 +14,10 @@ mode 별 설명입니다.
 |------|------|
 | 0 | tcp기준으로 pose 명령 받아서 moveit으로 경로 생성 |
 | 1 | tcp기준으로 position 과 현재 ORIENTATION으로 부터 각도 제한 |
-| 6 | deep기준으로 pose 명령 받아서 직접 IK 풀어서 경로 생성 |
+| 6 | DEEP기준으로 pose 명령 받아서 직접 IK 풀어서 경로 생성 |
 | 7 | tcp기준으로 pose 명령 받아서 직접 IK 풀어서 경로 생성 |
 | 8 | tcp기준으로 pose 명령 받아서 LIN 으로 경로 생성 |
-| 9 | deep기준으로 pose 명령 받아서 LIN 으로 경로 생성 |
+| 9 | DEEP기준으로 pose 명령 받아서 LIN 으로 경로 생성 |
 
 모드는 9번까지 가능하도록 되어있습니다. 2,3,4,5를 쓰고 더 쓰려면 127번 line을 수정해야 합니다.<br><br>
 
@@ -142,7 +142,7 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 
 - `move_back()` → `mode = 7`  
 **: move_forward 하기 전 위치로 복구**  
-  : RPY orientation 고정 IK 직접 풀어 경로 생성(TCP 기준)
+  : RPY orientation 고정 IK 직접 풀어 경로 생성(tcp 기준)
 
 
 ---
