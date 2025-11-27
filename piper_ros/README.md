@@ -118,6 +118,19 @@ open_gripper2()는 그리퍼가 열릴 때 세탁물이 끼는 것을 막기 위
 
 _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 비교할 수 있습니다.
 
+
+---
+
+## 🔹 basket.py
+**: Logic_inte_ba.py에 바구니 및 실패 복구 시 충돌 감지가 추가되어 있습니다.**  
+
+추가된 내용만 아래에 적었습니다. 나머지는 위에 Logic_inte_ba.py 설명을 참고하시면 됩니다.
+
+
+
+---
+
+
 ---
 
 ## 🔹 node2.py
