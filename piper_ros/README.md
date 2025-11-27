@@ -124,7 +124,7 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 **: 수정되거나 추가된 내용만 아래에 적었습니다. 나머지는 위의 Logic_inte_ba.py 설명을 참고하시면 됩니다.**  
 
 #### 1) Pinocchio 예측 토크 계산
-- `/arm_controller/state` → 목표 q, qdot, qddot 입력 -> RNEA 로 계산
+- `/arm_controller/state` → 목표 q, qdot, qddot 입력 → RNEA 로 계산
 - 예측 토크는 `A @ tau_pred + B` 로 보정하여 실 Effort와 비교합니다.
 - `/joint_states` → 실제 effort 입력  
 
