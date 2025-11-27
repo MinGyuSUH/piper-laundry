@@ -118,7 +118,7 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 ---
 
 ### 🔹 node2.py
-**더 자세한 건 (https://github.com/havy-nine/Laundry_decision) 에서 확인할 수 있습니다.**  
+**더 자세한 건 https://github.com/havy-nine/Laundry_decision 에서 확인할 수 있습니다.**  
 
 
 ---
