@@ -204,96 +204,246 @@ private:
     else if (goal->mode == 6) {        // pure IK + self-collision check + JTC
       RCLCPP_WARN(logger_, "[MODE 6] IK only, no planning (self-collision only)");
 
-      // 1️⃣ 목표 Pose 받기
-      geometry_msgs::msg::PoseStamped target_pose = goal->target_pose;
+      // 0) mode=9와 동일하게 target pose 생성
+      move_group_->setEndEffectorLink(DEEP_);
+      move_group_->setPoseReferenceFrame(base_frame_);
 
-      // 2️⃣ compute_ik 서비스 클라이언트 준비
+      // 현재 DEEP pose 읽고
+      const auto cur = move_group_->getCurrentPose(DEEP_).pose;
+      geometry_msgs::msg::Pose target = cur;
+
+      // 위치만 goal->target_pose의 position으로 교체
+      target.position = goal->target_pose.pose.position;
+
+      geometry_msgs::msg::PoseStamped ps;
+      ps.header.frame_id = base_frame_;
+      ps.header.stamp    = this->now();
+      ps.pose            = target;
+
+      // 디버깅용 출력
+      RCLCPP_INFO(logger_,
+                  "[MODE6] target (base=%s, link=%s): pos = [%.3f %.3f %.3f]",
+                  base_frame_.c_str(), DEEP_,
+                  ps.pose.position.x,
+                  ps.pose.position.y,
+                  ps.pose.position.z);
+
+      // 1) compute_ik 클라이언트
       auto ik_client = this->create_client<moveit_msgs::srv::GetPositionIK>("/compute_ik");
       if (!ik_client->wait_for_service(std::chrono::seconds(2))) {
-          RCLCPP_ERROR(logger_, "IK service not available");
-          ok = false;
-          msg = "IK service unavailable";
+        RCLCPP_ERROR(logger_, "IK service not available");
+        ok  = false;
+        msg = "IK service unavailable";
       } else {
-          // 3️⃣ 요청 구성
-          auto req = std::make_shared<moveit_msgs::srv::GetPositionIK::Request>();
+        auto req = std::make_shared<moveit_msgs::srv::GetPositionIK::Request>();
 
-          moveit::core::RobotState cur = *move_group_->getCurrentState();
-          moveit::core::robotStateToRobotStateMsg(cur, req->ik_request.robot_state);
+        // seed: 현재 상태
+        moveit::core::RobotState cur_state = *move_group_->getCurrentState();
+        moveit::core::robotStateToRobotStateMsg(cur_state, req->ik_request.robot_state);
 
-          req->ik_request.group_name       = move_group_->getName();
-          req->ik_request.ik_link_name     = DEEP_; // 있어도 되고 없어도 OK
-          req->ik_request.avoid_collisions = false;                              // ✅ 환경/자가충돌 무시하고 IK 해
-          req->ik_request.pose_stamped     = goal->target_pose;
-          req->ik_request.timeout          = rclcpp::Duration::from_seconds(0.2);
+        req->ik_request.group_name       = move_group_->getName(); // "arm"
+        req->ik_request.ik_link_name     = DEEP_;                  // tip 명시
+        req->ik_request.avoid_collisions = false;
+        req->ik_request.pose_stamped     = ps;
+        req->ik_request.timeout          = rclcpp::Duration::from_seconds(0.1);
 
-          auto resp = ik_client->async_send_request(req).get();
-          if (!resp || resp->error_code.val != resp->error_code.SUCCESS) {
-              RCLCPP_ERROR(logger_, "IK failed, code=%d", resp ? resp->error_code.val : -999);
-              ok = false;
-              msg = "IK failed";
+        // (중복이긴 한데, 명시적으로 joint_state도 맞춤)
+        req->ik_request.robot_state.joint_state.name     = move_group_->getJointNames();
+        req->ik_request.robot_state.joint_state.position = move_group_->getCurrentJointValues();
+
+        auto resp = ik_client->async_send_request(req).get();
+
+        if (!resp) {
+          RCLCPP_ERROR(logger_, "IK failed: null response");
+          ok  = false;
+          msg = "IK failed(null)";
+        } else if (resp->error_code.val != resp->error_code.SUCCESS) {
+          RCLCPP_ERROR(logger_,
+                      "IK failed, code=%d for pos=[%.3f %.3f %.3f]",
+                      resp->error_code.val,
+                      ps.pose.position.x,
+                      ps.pose.position.y,
+                      ps.pose.position.z);
+          ok  = false;
+          msg = "IK failed";
+        } else {
+          // 2) self-collision만 검사
+          const auto& model = move_group_->getRobotModel();
+          planning_scene::PlanningScene ps_scene(model);
+          moveit::core::RobotState sol(model);
+          moveit::core::robotStateMsgToRobotState(resp->solution, sol);
+          bool self_ok = !ps_scene.isStateColliding(sol, "arm");
+
+          if (!self_ok) {
+            RCLCPP_ERROR(logger_, "Self-collision detected! abort.");
+            ok  = false;
+            msg = "Self-collision";
           } else {
-              // 4️⃣ 자가충돌만 검사
-              const auto& model = move_group_->getRobotModel();
-              planning_scene::PlanningScene ps(model);
-              moveit::core::RobotState sol(model);
-              moveit::core::robotStateMsgToRobotState(resp->solution, sol);
-              bool self_ok = !ps.isStateColliding(sol, "arm");
+            using FTJ = control_msgs::action::FollowJointTrajectory;
+            auto jtc_client = rclcpp_action::create_client<FTJ>(
+                this->shared_from_this(), "/arm_controller/follow_joint_trajectory");
 
-              if (!self_ok) {
-                  RCLCPP_ERROR(logger_, "Self-collision detected! abort.");
-                  ok = false;
-                  msg = "Self-collision";
+            if (!jtc_client->wait_for_action_server(std::chrono::seconds(2))) {
+              RCLCPP_ERROR(logger_, "JTC server not available");
+              ok  = false;
+              msg = "JTC unavailable";
+            } else {
+              // IK 해 → q 추출
+              const auto* jmg = model->getJointModelGroup(move_group_->getName());
+              std::vector<double> q;
+              sol.copyJointGroupPositions(jmg, q);
+
+              FTJ::Goal goal_msg;
+              goal_msg.trajectory.joint_names = move_group_->getJointNames();
+
+              trajectory_msgs::msg::JointTrajectoryPoint p;
+              p.positions = q;
+              builtin_interfaces::msg::Duration tfs;
+              tfs.sec     = 3;
+              tfs.nanosec = 0;
+              p.time_from_start = tfs;
+              goal_msg.trajectory.points.push_back(p);
+
+              auto gh = jtc_client->async_send_goal(goal_msg).get();
+              if (!gh) {
+                RCLCPP_ERROR(logger_, "JTC goal rejected (nullptr handle)");
+                ok  = false;
+                msg = "JTC rejected";
               } else {
-                  using FTJ = control_msgs::action::FollowJointTrajectory;
-
-                  auto jtc_client = rclcpp_action::create_client<FTJ>(
-                      this->shared_from_this(), "/arm_controller/follow_joint_trajectory");
-
-                  if (!jtc_client->wait_for_action_server(std::chrono::seconds(2))) {
-                    RCLCPP_ERROR(logger_, "JTC server not available");
-                    ok = false;
-                    msg = "JTC unavailable";
-                  } else {
-                    // 1) IK 해에서 관절값 추출
-                    const auto* jmg = move_group_->getRobotModel()->getJointModelGroup(move_group_->getName());
-                    std::vector<double> q;
-                    sol.copyJointGroupPositions(jmg, q);
-
-                    // 2) 목표 한 점짜리 JT 구성
-                    FTJ::Goal goal_msg;
-                    goal_msg.trajectory.joint_names = move_group_->getJointNames();
-
-                    trajectory_msgs::msg::JointTrajectoryPoint p;
-                    p.positions = q;
-
-                    // 권장: builtin_interfaces::msg::Duration 로 세팅
-                    builtin_interfaces::msg::Duration tfs;
-                    tfs.sec = 3;
-                    tfs.nanosec = 0;
-                    p.time_from_start = tfs;
-
-                    goal_msg.trajectory.points.push_back(p);
-
-                    // 3) 전송 및 응답
-                    auto gh = jtc_client->async_send_goal(goal_msg).get();
-                    if (!gh) {  // ← nullptr이면 거부
-                      RCLCPP_ERROR(logger_, "JTC goal rejected (nullptr handle)");
-                      ok = false;
-                      msg = "JTC rejected";
-                    } else {
-                      // 결과 받기: client->async_get_result(handle)
-                      auto wrapped = jtc_client->async_get_result(gh).get();
-                      ok = (wrapped.code == rclcpp_action::ResultCode::SUCCEEDED) &&
-                          wrapped.result &&
-                          (wrapped.result->error_code == FTJ::Result::SUCCESSFUL);
-                      msg = ok ? "SUCCESS(IK→JTC)" : "FAILED(JTC exec)";
-                    }
-                  }
+                auto wrapped = jtc_client->async_get_result(gh).get();
+                ok = (wrapped.code == rclcpp_action::ResultCode::SUCCEEDED) &&
+                    wrapped.result &&
+                    (wrapped.result->error_code == FTJ::Result::SUCCESSFUL);
+                msg = ok ? "SUCCESS(IK→JTC)" : "FAILED(JTC exec)";
               }
+            }
           }
+        }
       }
     }
 
+    ////////////////////////////////////  pure IK solver like tcp  ///////////////////////////////////////////////////////
+
+    else if (goal->mode == 7) {        // pure IK + self-collision check + JTC
+      RCLCPP_WARN(logger_, "[MODE 7] IK only, no planning (self-collision only)");
+
+      // 0) mode=9와 동일하게 target pose 생성
+      move_group_->setEndEffectorLink(ee_link_);
+      move_group_->setPoseReferenceFrame(base_frame_);
+
+      // 현재 DEEP pose 읽고
+      const auto cur = move_group_->getCurrentPose(ee_link_).pose;
+      geometry_msgs::msg::Pose target = cur;
+
+      // 위치만 goal->target_pose의 position으로 교체
+      target.position = goal->target_pose.pose.position;
+
+      geometry_msgs::msg::PoseStamped ps;
+      ps.header.frame_id = base_frame_;
+      ps.header.stamp    = this->now();
+      ps.pose            = target;
+
+      // 디버깅용 출력
+      RCLCPP_INFO(logger_,
+                  "[MODE6] target (base=%s, link=%s): pos = [%.3f %.3f %.3f]",
+                  base_frame_.c_str(), ee_link_,
+                  ps.pose.position.x,
+                  ps.pose.position.y,
+                  ps.pose.position.z);
+
+      // 1) compute_ik 클라이언트
+      auto ik_client = this->create_client<moveit_msgs::srv::GetPositionIK>("/compute_ik");
+      if (!ik_client->wait_for_service(std::chrono::seconds(2))) {
+        RCLCPP_ERROR(logger_, "IK service not available");
+        ok  = false;
+        msg = "IK service unavailable";
+      } else {
+        auto req = std::make_shared<moveit_msgs::srv::GetPositionIK::Request>();
+
+        // seed: 현재 상태
+        moveit::core::RobotState cur_state = *move_group_->getCurrentState();
+        moveit::core::robotStateToRobotStateMsg(cur_state, req->ik_request.robot_state);
+
+        req->ik_request.group_name       = move_group_->getName(); // "arm"
+        req->ik_request.ik_link_name     = ee_link_;                  // tip 명시
+        req->ik_request.avoid_collisions = false;
+        req->ik_request.pose_stamped     = ps;
+        req->ik_request.timeout          = rclcpp::Duration::from_seconds(0.1);
+
+        // (중복이긴 한데, 명시적으로 joint_state도 맞춤)
+        req->ik_request.robot_state.joint_state.name     = move_group_->getJointNames();
+        req->ik_request.robot_state.joint_state.position = move_group_->getCurrentJointValues();
+
+        auto resp = ik_client->async_send_request(req).get();
+
+        if (!resp) {
+          RCLCPP_ERROR(logger_, "IK failed: null response");
+          ok  = false;
+          msg = "IK failed(null)";
+        } else if (resp->error_code.val != resp->error_code.SUCCESS) {
+          RCLCPP_ERROR(logger_,
+                      "IK failed, code=%d for pos=[%.3f %.3f %.3f]",
+                      resp->error_code.val,
+                      ps.pose.position.x,
+                      ps.pose.position.y,
+                      ps.pose.position.z);
+          ok  = false;
+          msg = "IK failed";
+        } else {
+          // 2) self-collision만 검사
+          const auto& model = move_group_->getRobotModel();
+          planning_scene::PlanningScene ps_scene(model);
+          moveit::core::RobotState sol(model);
+          moveit::core::robotStateMsgToRobotState(resp->solution, sol);
+          bool self_ok = !ps_scene.isStateColliding(sol, "arm");
+
+          if (!self_ok) {
+            RCLCPP_ERROR(logger_, "Self-collision detected! abort.");
+            ok  = false;
+            msg = "Self-collision";
+          } else {
+            using FTJ = control_msgs::action::FollowJointTrajectory;
+            auto jtc_client = rclcpp_action::create_client<FTJ>(
+                this->shared_from_this(), "/arm_controller/follow_joint_trajectory");
+
+            if (!jtc_client->wait_for_action_server(std::chrono::seconds(2))) {
+              RCLCPP_ERROR(logger_, "JTC server not available");
+              ok  = false;
+              msg = "JTC unavailable";
+            } else {
+              // IK 해 → q 추출
+              const auto* jmg = model->getJointModelGroup(move_group_->getName());
+              std::vector<double> q;
+              sol.copyJointGroupPositions(jmg, q);
+
+              FTJ::Goal goal_msg;
+              goal_msg.trajectory.joint_names = move_group_->getJointNames();
+
+              trajectory_msgs::msg::JointTrajectoryPoint p;
+              p.positions = q;
+              builtin_interfaces::msg::Duration tfs;
+              tfs.sec     = 3;
+              tfs.nanosec = 0;
+              p.time_from_start = tfs;
+              goal_msg.trajectory.points.push_back(p);
+
+              auto gh = jtc_client->async_send_goal(goal_msg).get();
+              if (!gh) {
+                RCLCPP_ERROR(logger_, "JTC goal rejected (nullptr handle)");
+                ok  = false;
+                msg = "JTC rejected";
+              } else {
+                auto wrapped = jtc_client->async_get_result(gh).get();
+                ok = (wrapped.code == rclcpp_action::ResultCode::SUCCEEDED) &&
+                    wrapped.result &&
+                    (wrapped.result->error_code == FTJ::Result::SUCCESSFUL);
+                msg = ok ? "SUCCESS(IK→JTC)" : "FAILED(JTC exec)";
+              }
+            }
+          }
+        }
+      }
+    }
     ///////////////////////////////////////////// LIN tcp ////////////////////////////////////////////////////////////////////////
 
     else if (goal->mode == 8) {        // now pose + none err
@@ -712,8 +862,8 @@ private:
 
     tf2::Quaternion q_lock; q_lock.setRPY(r,p,y);
     moveit_msgs::msg::OrientationConstraint ocm;
-    ocm.header.frame_id = base_frame_;
-    ocm.link_name = ee_link_;
+    ocm.header.frame_id = move_group_->getPlanningFrame();   // ✅ 현재 planning frame에 맞춤
+    ocm.link_name       = move_group_->getEndEffectorLink(); // ✅ 현재 EE 링크에 맞춤
     ocm.orientation = tf2::toMsg(q_lock);
     ocm.absolute_x_axis_tolerance = (roll_tol  > 0.0 ? roll_tol  : 1.0);
     ocm.absolute_y_axis_tolerance = (pitch_tol > 0.0 ? pitch_tol : 1.0);
