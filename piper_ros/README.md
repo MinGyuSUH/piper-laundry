@@ -95,6 +95,8 @@ mode 별 설명입니다.
 
 **→ 둘 다 k-means, fcm도 가능하고 sensor_callback 함수에 주석 처리 해놨습니다.** (cluster) conda 에서 실행해야 합니다. ( conda activate cluster )
 
+혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.
+
 #### 접촉/정렬 판단 방식 선택 (Heuristic / KMeans / FCM)
 판단 결과는 **아래 flag 중 무엇을 보느냐**로 방식이 결정됩니다.
 
@@ -112,8 +114,6 @@ mode 별 설명입니다.
 
 
 _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 비교할 수 있습니다.
-
-혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.
 
 ---
 
