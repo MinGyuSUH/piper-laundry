@@ -136,12 +136,12 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
   - FollowJointTrajectory **override 정지 명령**(속도 0) 전송  
 
 #### 3) PoseGoal 모드 매핑
-- `move_forward()` → `mode = 6`
+- `move_forward()` → `mode = 6` 
 **: 토크 기반 충돌 감지 활성화**  
   : RPY orientation 고정 IK 직접 풀어 경로 생성(DEEP 기준)
 
 
-- `move_back()` → `mode = 7`
+- `move_back()` → `mode = 7` 
 **: move_forward 하기 전 위치로 복구**  
   : RPY orientation 고정 IK 직접 풀어 경로 생성(TCP 기준)
 
