@@ -108,9 +108,10 @@ mode 별 설명입니다.
 
 - **FCM**
   - 파지(정렬) : `z_aligned_f`
-  - 슬립/접촉 : `contacted_ff` 
+  - 슬립/접촉 : `contacted_ff`
 
 
+self._log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 비교할 수 있습니다.
 
 혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.
 
