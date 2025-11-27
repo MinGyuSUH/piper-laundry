@@ -454,6 +454,11 @@ class ControlTower(Node):
                 else:
                     self.z_aligned = False
 
+                    
+
+
+
+
 ########################## 비지도 클러스터링 ####################################################
 
             # # --- KMeans/FCM --- COLOR_MAP = {0: "green", 1: "red", 2: "gray"}
@@ -780,11 +785,13 @@ class ControlTower(Node):
         self.get_logger().info("Step 0: 문 여는 중")
         self.open_door()
 
-        while rclpy.ok():
+        while not self.goal(self.wm_mid, 'keep'): # 사진
+                self.get_logger().warn("  >> 실패 → 재시도 중")
+        self.target_get_bg() 
+        
 
-            while not self.goal(self.wm_mid, 'keep'): # 사진
-                    self.get_logger().warn("  >> 실패 → 재시도 중")
-            self.target_get_bg() 
+        while rclpy.ok():
+            
             self.open_gripper()
 
             while True:
@@ -799,7 +806,7 @@ class ControlTower(Node):
                 target_ba = self.target_get_ba(mode="basket")  # 감지
 
                 for i in range(5):
-                    if self.send_pose_ba(target_ba): #6 
+                    if self.send_pose_ba(target_ba): #1 
                         break
                     self.get_logger().warn(f"  >> pose 명령 실패 ({i+1}/5) → 재시도 중")
                 else:  
@@ -905,3 +912,8 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
+
+
+
+    
