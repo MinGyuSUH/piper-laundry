@@ -66,7 +66,7 @@ python node2.py # conda 환경에서 실행 ( conda activate rs )
 
 **node2.py** : 요청 받아서 좌표 보내주는 파일입니다. (rs) conda에서 실행해야합니다. ( conda activate rs )
 
-더 자세한 건 (https://github.com/havy-nine/Laundry_decision) 에서 확인할 수 있습니다.<br><br>
+더 자세한 건 https://github.com/havy-nine/Laundry_decision 에서 확인할 수 있습니다.<br><br>
 
 **planning_scene.cpp** : 여기서 바구니 위치 등 moveit 환경을 수정할 수 있습니다. <br><br>
 
