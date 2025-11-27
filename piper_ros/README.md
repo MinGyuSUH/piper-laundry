@@ -52,10 +52,77 @@ open_gripper2()는 그리퍼가 열릴 때 세탁물이 끼는 것을 막기 위
 
 #### 2) TargetPose 수신 함수 (node2.py와 통신)
 아래 함수들은 **TargetPose 액션 서버(node2.py)** 에게 target을 요청해서 받아오는 역할입니다.
-의 Logic_inte_ba.py 설명을 참고하시면 됩니다.**  
+
+- `target_get_bg()`  
+  : 배경/기준 프레임 저장용 요청 (`mode="failure_bg"`).  
+  grasp 전에 background를 갱신해 segmentation 안정화에 사용됩니다.
+
+- `target_get_ba()`  
+  : basket 영역 기준 target pose 요청 (`mode="basket"`).  
+  → EE pose(`/end_pose`)와 ee2cam 캘리브레이션을 이용해 base 좌표로 변환합니다.
+
+- `target_get_wm()`  
+  : wm 영역 기준 target pose 요청 (`mode="failure"`).  
+  → 동일하게 base 좌표로 변환 후 실패복구에 사용합니다.
 
 
+#### 3) PoseGoal 모드 매핑
+- `send_pose_ba()` → `mode = 1`  
+  : position + RPY orientation constraint (tcp 기준)
 
+- `send_pose_wm()` → `mode = 0`  
+**: 실패 복구를 포함한 ba에서 wm으로로
+  : position + RPY orientation 고정 (tcp 기준)
+
+- `move_forward()` → `mode = 9`  
+  : RPY orientation 고정 LIN 직선 이동(DEEP 기준)
+
+
+## 🔹 Logic_inte_wm.py
+**위의 Logic_inte_ba.py와 함수 이름 빼고 동일**  
+
+#### 2) TargetPose 수신 함수
+
+- `target_get()`  
+  : wm 영역 기준 target pose 요청 (`mode="wm"`).  
+
+#### 3) PoseGoal 모드 매핑
+- `send_pose()` → `mode = 1`  
+  : position + RPY orientation constraint (tcp 기준)
+
+- `move_forward()` → `mode = 9`  
+  : RPY orientation 고정 LIN 직선 이동(DEEP 기준)<br><br>
+  
+
+**→ 둘 다 k-means, fcm도 가능하고 sensor_callback 함수에 주석 처리 해놨습니다.** (cluster) conda 에서 실행해야 합니다. ( conda activate cluster )
+
+혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.
+
+#### 접촉/정렬 판단 방식 선택 (Heuristic / KMeans / FCM)
+판단 결과는 **아래 flag 중 무엇을 보느냐**로 방식이 결정됩니다.
+
+- **Heuristic (기본)**
+  - 파지 : `z_aligned`
+  - 슬립 : `contacted`
+
+휴리스틱한 기준은 sensor_callback 함수에서 변경할 수 있습니다. (norm, theta_deg) 
+
+- **KMeans**
+  - 파지 : `z_aligned_k`
+  - 슬립 : `contacted_kk` 
+
+- **FCM**
+  - 파지 : `z_aligned_f`
+  - 슬립 : `contacted_ff`
+
+
+_log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 비교할 수 있습니다.
+
+
+---
+
+## 🔹 basket.py
+**: 추가된 내용만 아래에 적었습니다. 나머지는 위의 Logic_inte_ba.py 설명을 참고하시면 됩니다.**  
 
 ---
 
