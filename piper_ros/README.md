@@ -127,10 +127,6 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 추가된 내용만 아래에 적었습니다. 나머지는 위에 Logic_inte_ba.py 설명을 참고하시면 됩니다.
 
 
-
----
-
-
 ---
 
 ## 🔹 node2.py
