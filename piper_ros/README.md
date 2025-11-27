@@ -71,7 +71,6 @@ open_gripper2()는 그리퍼가 열릴 때 세탁물이 끼는 것을 막기 위
   : position + RPY orientation constraint (tcp 기준)
 
 - `send_pose_wm()` → `mode = 0`  
-**: 실패 복구를 포함한 ba에서 wm으로**  
   : position + RPY orientation 고정 (tcp 기준)
 
 - `move_forward()` → `mode = 9`  
