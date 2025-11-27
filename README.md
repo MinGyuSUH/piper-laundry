@@ -1,5 +1,17 @@
 # Piper-Laundry
 
+
+
+Camera (node2.py)
+  ↓  TargetPose (Action)
+basket / Logic_inte_ba / Logic_inte_wm  (Python)
+  ↓  Pose + Mode (PoseGoal Action Client)
+pose_goal.cpp  (PoseGoal Action Server)
+  ↓  JointTrajectory / FollowJointTrajectory
+ROS2 Controller → Robot
+
+
+
 ## 추가 설치
 ```bash
 git clone https://github.com/havy-nine/Laundry_decision.git
