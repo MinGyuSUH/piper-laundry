@@ -102,6 +102,8 @@ mode 별 설명입니다.
   - 파지 : `z_aligned`
   - 슬립 : `contacted`
 
+휴리스틱한 기준은 sensor_callback 함수에서 변경할 수 있습니다. (norm, theta_deg) 
+
 - **KMeans**
   - 파지 : `z_aligned_k`
   - 슬립 : `contacted_kk` 
