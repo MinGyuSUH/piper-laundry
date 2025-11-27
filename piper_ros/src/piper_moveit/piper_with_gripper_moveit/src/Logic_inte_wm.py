@@ -628,8 +628,8 @@ class ControlTower(Node):
             while not self.goal(self.ba_end, 'keep'):
                 self.get_logger().warn("  >> 실패 → 재시도 중")
 
-            # while not self.goal(self.h, 'keep'):
-            #     self.get_logger().warn("  >> 실패 → 재시도 중")
+            while not self.goal(self.h, 'keep'):
+                self.get_logger().warn("  >> 실패 → 재시도 중")
 
             self.open_gripper()
             while not self.goal(self.ba_init, 'keep'):
