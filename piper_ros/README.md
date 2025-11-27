@@ -71,7 +71,7 @@ open_gripper2()는 그리퍼가 열릴 때 세탁물이 끼는 것을 막기 위
   : position + RPY orientation constraint (tcp 기준)
 
 - `send_pose_wm()` → `mode = 0`  
-**: 실패 복구를 포함한 ba에서 wm으로로
+**: 실패 복구를 포함한 ba에서 wm으로
   : position + RPY orientation 고정 (tcp 기준)
 
 - `move_forward()` → `mode = 9`  
@@ -125,22 +125,24 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 **: 수정되거나 추가된 내용만 아래에 적었습니다. 나머지는 위의 Logic_inte_ba.py 설명을 참고하시면 됩니다.**  
 
 #### 1) Pinocchio 예측 토크 계산
-- `/arm_controller/state` → 목표 q, qdot, qddot 입력  
-- `/joint_states` → 실제 effort 입력  
+- `/arm_controller/state` → 목표 q, qdot, qddot 입력 -> RNEA 로 계산
 - 예측 토크는 `A @ tau_pred + B` 로 보정하여 실 Effort와 비교합니다.
+- `/joint_states` → 실제 effort 입력  
 
-#### 2) 4σ 기반 충돌 감지(핵심)
+#### 2) 4σ 기반 충돌 감지
 - joint4, joint5의 **|pred – real| > 4σ** 발생 시 즉시 충돌로 판단합니다.
 - 충돌 발생 순간:
   - PoseGoal **cancel**
   - FollowJointTrajectory **override 정지 명령**(속도 0) 전송  
 
-#### 3) forward / back 동작
+#### 3) PoseGoal 모드 매핑
 - `move_forward()` → `mode = 6`  
-  : DEEP 기준 직선 이동 + **충돌 감지**
+  : RPY orientation 고정 IK 직접 풀어 경로 생성(DEEP 기준)
+**: 토크 기반 충돌 감지 활성화
 
-- `move_back()` → `mode = 7`  
-  : move_forward 하기 전으로 복구
+- `move_back()` → `mode = 7`
+  : RPY orientation 고정 IK 직접 풀어 경로 생성(TCP 기준)
+**: move_forward 하기 전 위치로 복구
 
 ---
 
