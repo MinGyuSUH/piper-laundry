@@ -46,7 +46,8 @@ mode 별 설명입니다.
 | `'open'` | `open_gripper()` 호출 → 그리퍼 오픈 |
 | `'close'` | `close_gripper()` 호출 → 그리퍼 클로즈 |
 
-%참고% open_gripper()와 open_gripper2() 가 있습니다. open_gripper2()는 그리퍼가 열릴 때 세탁물이 끼는 것을 막기 위해 0.03만큼(기존 0.035) 오픈합니다.
+%참고% open_gripper()와 open_gripper2() 가 있습니다. 
+open_gripper2()는 그리퍼가 열릴 때 세탁물이 끼는 것을 막기 위해 0.03만큼(기존 0.035) 오픈합니다.
 
 
 #### 2) TargetPose 수신 함수 (node2.py와 통신)
