@@ -122,26 +122,30 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 ---
 
 ## 🔹 basket.py
-**: 추가된 내용만 아래에 적었습니다. 나머지는 위의 Logic_inte_ba.py 설명을 참고하시면 됩니다.**  
+**: 수정되거나 추가된 내용만 아래에 적었습니다. 나머지는 위의 Logic_inte_ba.py 설명을 참고하시면 됩니다.**  
+
+#### 1) Pinocchio 예측 토크 계산
+- `/arm_controller/state` → 목표 q, qdot, qddot 입력  
+- `/joint_states` → 실제 effort 입력  
+- 예측 토크는 `A @ tau_pred + B` 로 보정하여 실 Effort와 비교합니다.
+
+#### 2) 4σ 기반 충돌 감지(핵심)
+- joint4, joint5의 **|pred – real| > 4σ** 발생 시 즉시 충돌로 판단합니다.
+- 충돌 발생 순간:
+  - PoseGoal **cancel**
+  - FollowJointTrajectory **override 정지 명령**(속도 0) 전송  
+
+#### 3) forward / back 동작
+- `move_forward()` → `mode = 6`  
+  : DEEP 기준 직선 이동 + **충돌 감지**
+
+- `move_back()` → `mode = 7`  
+  : move_forward 하기 전으로 복구
 
 ---
 
 ## 🔹 node2.py
 **더 자세한 건 https://github.com/havy-nine/Laundry_decision 에서 확인할 수 있습니다.**  
 
-
----
-
-
-## 🔹 TEST_stop_demo.py
-**: moveit에서 생성한 경로로 예측한 전류랑 실제 전류랑 비교해서 넘어가면 멈추는 데모 파일 입니다.**  
-
-
-- `/end_pose`를 받아 target pose 갱신
-- pose_goal(mode 8 → mode 6) 반복 이동
-- 100Hz 예측 토크 계산 + 실 Effort 비교
-- 4σ 이상 오차 발생 시 즉시 정지(cancel + override)
-- `q` = 강제 정지 / `s` = 재시작
-- 실시간 토크 플롯 시각화 포함
 
 ---
