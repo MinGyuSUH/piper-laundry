@@ -1,5 +1,5 @@
 
-### 🔹 pose_goal.cpp
+## 🔹 pose_goal.cpp
 **: PoseGoal 액션으로 주고 받으며 moveit 명령을 전달합니다.**  
 
 
@@ -23,7 +23,7 @@ mode 별 설명입니다.
 
 ---
 
-### 🔹 Logic_inte_ba.py
+## 🔹 Logic_inte_ba.py
 **: 실패 복구를 포함한 ba에서 wm으로 가는 실행 파일입니다.**  
 
 
@@ -77,7 +77,7 @@ mode 별 설명입니다.
   : RPY orientation 고정 LIN 직선 이동(DEEP 기준)
 
 
-### 🔹 Logic_inte_wm.py
+## 🔹 Logic_inte_wm.py
 **위의 Logic_inte_ba.py와 함수 이름 빼고 동일**  
 
 #### 2) TargetPose 수신 함수
@@ -117,14 +117,14 @@ _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 
 
 ---
 
-### 🔹 node2.py
+## 🔹 node2.py
 **더 자세한 건 https://github.com/havy-nine/Laundry_decision 에서 확인할 수 있습니다.**  
 
 
 ---
 
 
-### 🔹 TEST_stop_demo.py
+## 🔹 TEST_stop_demo.py
 **: moveit에서 생성한 경로로 예측한 전류랑 실제 전류랑 비교해서 넘어가면 멈추는 데모 파일 입니다.**  
 
 
