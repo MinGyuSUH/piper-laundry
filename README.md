@@ -2,13 +2,13 @@
 
 
 
-Camera (node2.py)
-  ↓  TargetPose (Action)
-basket / Logic_inte_ba / Logic_inte_wm  (Python)
-  ↓  Pose + Mode (PoseGoal Action Client)
-pose_goal.cpp  (PoseGoal Action Server)
-  ↓  JointTrajectory / FollowJointTrajectory
-ROS2 Controller → Robot
+Camera (node2.py)   
+  ↓  TargetPose (Action)   
+basket / Logic_inte_ba / Logic_inte_wm  (Python)   
+  ↓  Pose + Mode (PoseGoal Action Client)   
+pose_goal.cpp  (PoseGoal Action Server)   
+  ↓  JointTrajectory / FollowJointTrajectory   
+ROS2 Controller → Robot   
 
 
 
