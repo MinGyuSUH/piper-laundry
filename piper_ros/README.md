@@ -99,16 +99,16 @@ mode 별 설명입니다.
 판단 결과는 **아래 flag 중 무엇을 보느냐**로 방식이 결정됩니다.
 
 - **Heuristic (기본)**
-  - 파지(정렬) : `z_aligned`
-  - 슬립/접촉 : `contacted`
+  - 파지 : `z_aligned`
+  - 슬립 : `contacted`
 
 - **KMeans**
-  - 파지(정렬) : `z_aligned_k`
-  - 슬립/접촉 : `contacted_kk` 
+  - 파지 : `z_aligned_k`
+  - 슬립 : `contacted_kk` 
 
 - **FCM**
-  - 파지(정렬) : `z_aligned_f`
-  - 슬립/접촉 : `contacted_ff`
+  - 파지 : `z_aligned_f`
+  - 슬립 : `contacted_ff`
 
 
 _log_state_table("grasp-check") 함수를 활용하면 3가지 방식을 쉽게 비교할 수 있습니다.
