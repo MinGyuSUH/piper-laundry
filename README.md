@@ -58,11 +58,7 @@ python node2.py # conda 환경에서 실행 ( conda activate rs )
 
 **Logic_inte_ba.py** : 실패 복구를 포함한 ba에서 wm으로 가는 실행 파일입니다.
 
-**Logic_inte_wm.py** : wm에서 ba로 가는 실행 파일입니다.
-
-→ 둘 다 k-means fcm도 가능하고 sensor_callback 함수에 주석 처리 해놨습니다. (cluster) conda 에서 실행해야 합니다. ( conda activate cluster )
-
-혹시 안되면 kroc.py 의 sensor_callback 함수 참고하시면 됩니다.<br><br>
+**Logic_inte_wm.py** : wm에서 ba로 가는 실행 파일입니다.<br><br>
 
 **node2.py** : 요청 받아서 좌표 보내주는 파일입니다. (rs) conda에서 실행해야합니다. ( conda activate rs )
 
